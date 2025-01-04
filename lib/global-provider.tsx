@@ -31,19 +31,20 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
   const isLoggedIn = !!user; // for !null => true
 
-  // console.log(JSON.stringify(user, null, 2));
+  console.log(JSON.stringify(user, null, 2));
   return (
-    <GlobalContext.Provider value={{
-      isLoggedIn,
-      user,
-      loading,
-      refetch
-    }}>
-
+    <GlobalContext.Provider
+      value={{
+        isLoggedIn,
+        user,
+        loading,
+        refetch,
+      }}
+    >
       {children}
     </GlobalContext.Provider>
-  )
-}
+  );
+};
 
 export const useGlobalContext = (): GlobalContextType => {
   const context = useContext(GlobalContext);
@@ -53,6 +54,6 @@ export const useGlobalContext = (): GlobalContextType => {
   }
 
   return context;
-}
+};
 
 export default GlobalProvider;
