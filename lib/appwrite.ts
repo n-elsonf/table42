@@ -1,12 +1,23 @@
-import { Account, Avatars, Client, OAuthProvider } from "react-native-appwrite"
+import { Account, AppwriteException, Avatars, Client, Databases, ID, OAuthProvider } from "react-native-appwrite"
 import * as Linking from 'expo-linking'
 import { openAuthSessionAsync } from "expo-web-browser"
 
 
+import { User } from "./global-provider"
+
+const EXPO_PUBLIC_APPWRITE_PROJECT_ID = "67798bf60031d5df9d7b"
+const EXPO_PUBLIC_APPWRITE_ENDPOINT = "https://cloud.appwrite.io/v1"
+const EXPO_PUBLIC_APPWRITE_STORAGE_ID = "6779d52b00195f2095ac"
+const EXPO_PUBLIC_APPWRITE_DATABASE_ID = "6779d5db002637002052"
+const EXPO_PUBLIC_USER_COLLECTION_ID = "6779d63100221ad7f464"
+
+
 export const config = {
   platform: 'com.table42app.TABLE42',
-  endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT,
-  projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID
+  endpoint: EXPO_PUBLIC_APPWRITE_ENDPOINT,
+  projectId: EXPO_PUBLIC_APPWRITE_PROJECT_ID,
+  databaseId: EXPO_PUBLIC_APPWRITE_DATABASE_ID,
+  userCollectionId: EXPO_PUBLIC_USER_COLLECTION_ID,
 }
 
 export const client = new Client();
@@ -18,6 +29,7 @@ client
 
 export const avatar = new Avatars(client);
 export const account = new Account(client);
+export const databases = new Databases(client);
 
 export async function login() {
   try {
@@ -42,6 +54,39 @@ export async function login() {
 
     const session = await account.createSession(userId, secret);
     if (!session) throw new Error("Failed to create a session");
+
+    const userDetails = await account.get();
+
+    console.log(userDetails)
+
+
+    try {
+
+      const result = await databases.getDocument(
+        config.databaseId,
+        config.userCollectionId,
+        userDetails.$id
+      );
+
+      console.log(result);
+
+    } catch (error) {
+      if (error instanceof AppwriteException && error.code === 404) {
+
+        console.log("Yo");
+
+        await databases.createDocument(config.databaseId, config.userCollectionId, userDetails.$id, {
+          userID: userDetails.$id,
+        });
+        console.log("New User created");
+
+      } else {
+        console.error(error);
+      }
+    }
+
+
+
 
     return true;
   } catch (error) {
@@ -77,3 +122,11 @@ export async function getCurrentUser() {
     return null;
   }
 }
+
+// export async function saveUserToDB(user: User) {
+//   try {
+//     const newUser = await databases.createDocument(config.databaseId, config.userCollectionId, user.$id, user)
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

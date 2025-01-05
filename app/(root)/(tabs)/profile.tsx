@@ -55,7 +55,7 @@ const Profile = () => {
 
         <View className='flex-row justify-center flex mt-5'>
           <View className='flex flex-col items-center relative mt-5'>
-            <Image source={{ uri: user?.avatar }} className='size-44 relative rounded-full border-4' />
+            <Image src={user?.avatar} className='size-44 relative rounded-full border-4' />
             <TouchableOpacity className="absolute bottom-11 right-2" onPress={handleEdit}>
               <Image source={icons.edit} className='size-9'></Image>
             </TouchableOpacity>

@@ -3,7 +3,7 @@ import { useAppwrite } from "./useAppwrite";
 
 import { getCurrentUser } from "./appwrite";
 
-interface User {
+export interface User {
   $id: string;
   name: string;
   email: string;
